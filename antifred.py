@@ -1,6 +1,6 @@
 import os
 import discord
-from discord.ext import commands
+from discord.ext import commands, interactions
 
 intents = discord.Intents.default()
 intents.message_content = True  # Enable message content intent
@@ -12,11 +12,11 @@ async def on_ready():
     print(f'Logged in as {bot.user.name} ({bot.user.id})')
     print('------')
 
-@bot.slash_command(
+@interactions.slash_command(
     name="clearfred",
     description="Clears messages from FredBoat in the current channel"
 )
-async def clearfred(ctx: commands.SlashContext, limit: int = 100):
+async def clearfred(ctx: interactions.SlashContext, limit: int = 100):
     if not ctx.author.guild_permissions.manage_messages:
         await ctx.send("You don't have the required permissions to execute this command.", ephemeral=True)
         return
@@ -24,7 +24,7 @@ async def clearfred(ctx: commands.SlashContext, limit: int = 100):
     def is_fredboat(msg):
         return msg.author.id == 184405311681986560
 
-    deleted = await ctx.channel.purge(limit=limit, check=is_fredboat, bulk=True)
+    deleted = await ctx.channel.purge(limit=limit, check=is_fredboat)
     await ctx.send(f"Deleted {len(deleted)} message(s) from FredBoat.", ephemeral=True)
 
 # Use the environment variable to get the bot token
