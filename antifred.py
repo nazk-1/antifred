@@ -11,8 +11,10 @@ bot = interactions.Client(token=os.getenv('DISCORD_BOT_TOKEN'))
     scope=1234567890  # replace with your guild ID
 )
 async def clearfred(ctx: interactions.CommandContext):
+    await ctx.defer(ephemeral=True)  # Defer the response
+
     if not ctx.author.permissions & interactions.Permissions.MANAGE_MESSAGES:
-        await ctx.send("You don't have the required permissions to execute this command.", ephemeral=True)
+        await ctx.send("You don't have the required permissions to execute this command.")
         return
 
     def is_fredboat(msg):
@@ -25,13 +27,13 @@ async def clearfred(ctx: interactions.CommandContext):
     for msg in fredboat_messages:
         await msg.delete()
 
-    await ctx.send(f"Deleted {len(fredboat_messages)} message(s) from FredBoat.", ephemeral=True)
+    await ctx.send(f"Deleted {len(fredboat_messages)} message(s) from FredBoat.")
 
-# Event listener to automatically delete FredBoat's messages after 10 seconds
+# Event listener to automatically delete FredBoat's messages after 5 seconds
 @bot.event
 async def on_message_create(ctx):
     if ctx.author.id == 184405311681986560:  # FredBoat's User ID
-        await asyncio.sleep(10)
+        await asyncio.sleep(5)  # Change delay to 5 seconds
         try:
             await ctx.delete()
         except Exception as e:
