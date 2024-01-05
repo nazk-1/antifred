@@ -1,42 +1,40 @@
-import os
 import asyncio
-import discord
-from discord.ext import commands
+import os
+import interactions
 
-intents = discord.Intents.default()
-intents.messages = True
-intents.message_content = True
+bot = interactions.Client(token=os.getenv('DISCORD_BOT_TOKEN'))
 
-bot = commands.Bot(command_prefix="!", intents=intents)
-
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user.name}')
-    await bot.tree.sync()  # Synchronize slash commands
-
-@bot.event
-async def on_message(message):
-    if message.author.id == 184405311681986560:  # FredBoat's User ID
-        await asyncio.sleep(10)  # 10-second delay
-        try:
-            await message.delete()
-        except discord.Forbidden:
-            print("I don't have permission to delete this message.")
-        except discord.NotFound:
-            print("Message was not found (maybe it was already deleted).")
-
-    await bot.process_commands(message)
-
-@bot.tree.command(name="clearfred", description="Clears messages from FredBoat in the current channel")
-async def clearfred(interaction: discord.Interaction, limit: int = 100):
-    if not interaction.user.guild_permissions.manage_messages:
-        await interaction.response.send_message("You don't have the required permissions to execute this command.", ephemeral=True)
+# Slash Command to clear messages from FredBoat
+@bot.command(
+    name="clearfred",
+    description="Clears messages from FredBoat in the current channel",
+    scope=1234567890  # replace with your guild ID
+)
+async def clearfred(ctx: interactions.CommandContext):
+    if not ctx.author.permissions & interactions.Permissions.MANAGE_MESSAGES:
+        await ctx.send("You don't have the required permissions to execute this command.", ephemeral=True)
         return
 
     def is_fredboat(msg):
-        return msg.author.id == 184405311681986560
+        return msg.author.id == 184405311681986560  # FredBoat's User ID
 
-    deleted = await interaction.channel.purge(limit=limit, check=is_fredboat, bulk=True)
-    await interaction.response.send_message(f"Deleted {len(deleted)} message(s) from FredBoat.", ephemeral=True)
+    channel = await bot.get_channel(ctx.channel_id)
+    messages = await channel.get_messages(limit=100)
+    fredboat_messages = [msg for msg in messages if is_fredboat(msg)]
 
-bot.run(os.getenv('DISCORD_BOT_TOKEN'))
+    for msg in fredboat_messages:
+        await msg.delete()
+
+    await ctx.send(f"Deleted {len(fredboat_messages)} message(s) from FredBoat.", ephemeral=True)
+
+# Event listener to automatically delete FredBoat's messages after 10 seconds
+@bot.event
+async def on_message_create(ctx):
+    if ctx.author.id == 184405311681986560:  # FredBoat's User ID
+        await asyncio.sleep(10)
+        try:
+            await ctx.delete()
+        except Exception as e:
+            print(f"Error in deleting message: {e}")
+
+bot.start()
