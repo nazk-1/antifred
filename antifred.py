@@ -1,32 +1,22 @@
 import os
 import discord
 from discord.ext import commands
-import asyncio
-from interactions import Client  # Updated import statement
 
 intents = discord.Intents.default()
-intents.messages = True
-intents.message_content = True
+intents.message_content = True  # Enable message content intent
 
 bot = commands.Bot(command_prefix="!", intents=intents)
-slash = Client(token=os.getenv('DISCORD_BOT_TOKEN'))  # Updated Client import
 
 @bot.event
-async def on_message(message):
-    if message.author.id == 184405311681986560:  # FredBoat's User ID
-        await asyncio.sleep(30)  # Wait for 30 seconds before deleting the message
-        try:
-            await message.delete()
-        except discord.errors.Forbidden:
-            print("I don't have permission to delete this message.")
-        except discord.errors.NotFound:
-            print("Message was not found (maybe it was already deleted).")
+async def on_ready():
+    print(f'Logged in as {bot.user.name} ({bot.user.id})')
+    print('------')
 
-@slash.command(
+@bot.slash_command(
     name="clearfred",
     description="Clears messages from FredBoat in the current channel"
 )
-async def clearfred(ctx, limit: int = 100):  # Removed interactions.CommandContext
+async def clearfred(ctx: commands.SlashContext, limit: int = 100):
     if not ctx.author.guild_permissions.manage_messages:
         await ctx.send("You don't have the required permissions to execute this command.", ephemeral=True)
         return
@@ -37,4 +27,12 @@ async def clearfred(ctx, limit: int = 100):  # Removed interactions.CommandConte
     deleted = await ctx.channel.purge(limit=limit, check=is_fredboat, bulk=True)
     await ctx.send(f"Deleted {len(deleted)} message(s) from FredBoat.", ephemeral=True)
 
-slash.start()
+# Use the environment variable to get the bot token
+bot_token = os.environ.get("DISCORD_BOT_TOKEN")
+
+# Make sure the bot token is not None
+if bot_token is not None:
+    # Start the bot with the token
+    bot.run(bot_token)
+else:
+    print("Bot token not found in environment variables.")
