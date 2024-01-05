@@ -4,14 +4,14 @@ import interactions
 
 bot = interactions.Client(token=os.getenv('DISCORD_BOT_TOKEN'))
 
-# Slash Command to clear messages from FredBoat
+# Slash Command to clear messages from FredBoat (Global Command)
 @interactions.slash_command(
     name="clearfred",
-    description="Clears messages from FredBoat in the current channel",
-    scope=1234567890  # Replace with your guild ID
+    description="Clears messages from FredBoat in the current channel"
+    # No scopes parameter needed for a global command
 )
-async def clearfred(ctx: interactions.CommandContext):
-    await ctx.defer(ephemeral=True)  # Defer the response
+async def clearfred(ctx: interactions.SlashContext):
+    await ctx.defer(ephemeral=True)
 
     if not ctx.author.permissions & interactions.Permissions.MANAGE_MESSAGES:
         await ctx.send("You don't have the required permissions to execute this command.", ephemeral=True)
@@ -29,8 +29,8 @@ async def clearfred(ctx: interactions.CommandContext):
 # Event listener to automatically delete FredBoat's messages after 5 seconds
 @bot.event
 async def on_message_create(message):
-    if message.author.id == 184405311681986560:  # FredBoat's User ID
-        await asyncio.sleep(5)  # 5-second delay
+    if message.author.id == 184405311681986560:
+        await asyncio.sleep(5)
         try:
             await message.delete()
         except Exception as e:
