@@ -5,7 +5,7 @@ import interactions
 bot = interactions.Client(token=os.getenv('DISCORD_BOT_TOKEN'))
 
 # Slash Command to clear messages from FredBoat
-@bot.command(
+@interactions.slash_command(
     name="clearfred",
     description="Clears messages from FredBoat in the current channel",
     scope=1234567890  # Replace with your guild ID
