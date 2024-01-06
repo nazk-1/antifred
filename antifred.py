@@ -11,15 +11,6 @@ bot = interactions.Client(token=os.getenv('DISCORD_BOT_TOKEN'))
 async def clearfred(ctx: interactions.SlashContext):
     await ctx.defer(ephemeral=True)
 
-    # Checking permissions using try-except block
-    try:
-        if not ctx.author.permissions & interactions.Permissions.MANAGE_MESSAGES:
-            await ctx.send("You don't have the required permissions to execute this command.", ephemeral=True)
-            return
-    except AttributeError:
-        await ctx.send("Cannot verify permissions.", ephemeral=True)
-        return
-
     channel = bot.get_channel(ctx.channel_id)
     messages = await channel.history(limit=100).flatten()
     fredboat_messages = [msg for msg in messages if msg.author.id == 184405311681986560]
