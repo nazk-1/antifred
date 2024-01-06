@@ -4,7 +4,6 @@ import interactions
 
 bot = interactions.Client(token=os.getenv('DISCORD_BOT_TOKEN'))
 
-# Slash Command to clear messages from FredBoat
 @interactions.slash_command(
     name="clearfred",
     description="Clears messages from FredBoat in the current channel"
@@ -12,9 +11,13 @@ bot = interactions.Client(token=os.getenv('DISCORD_BOT_TOKEN'))
 async def clearfred(ctx: interactions.SlashContext):
     await ctx.defer(ephemeral=True)
 
-    member = ctx.guild.get_member(ctx.author.id)
-    if not member.permissions & interactions.Permissions.MANAGE_MESSAGES:
-        await ctx.send("You don't have the required permissions to execute this command.", ephemeral=True)
+    # Checking permissions using try-except block
+    try:
+        if not ctx.author.permissions & interactions.Permissions.MANAGE_MESSAGES:
+            await ctx.send("You don't have the required permissions to execute this command.", ephemeral=True)
+            return
+    except AttributeError:
+        await ctx.send("Cannot verify permissions.", ephemeral=True)
         return
 
     channel = bot.get_channel(ctx.channel_id)
@@ -26,11 +29,10 @@ async def clearfred(ctx: interactions.SlashContext):
 
     await ctx.send(f"Deleted {len(fredboat_messages)} message(s) from FredBoat.", ephemeral=True)
 
-# Event listener to automatically delete FredBoat's messages after 5 seconds
 @bot.event
 async def on_message_create(message):
-    if message.author.id == 184405311681986560:  # FredBoat's User ID
-        await asyncio.sleep(5)  # 5-second delay
+    if message.author.id == 184405311681986560:
+        await asyncio.sleep(5)
         try:
             await message.delete()
         except Exception as e:
