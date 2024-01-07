@@ -13,7 +13,7 @@ async def clearfred(ctx: interactions.SlashContext):
 
     channel = bot.get_channel(ctx.channel_id)
     messages = await channel.history(limit=100).flatten()
-    fredboat_messages = [msg for msg in messages if msg.author.id == 945683386100514827, 1192896664109863004]
+    fredboat_messages = [msg for msg in messages if msg.author.id == 945683386100514827]
 
     for msg in fredboat_messages:
         await msg.delete()
