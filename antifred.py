@@ -24,7 +24,7 @@ async def clearfred(ctx: interactions.SlashContext):
 @bot.event
 async def on_message_create(message):
     if message.author.id == 184405311681986560:
-        await asyncio.sleep(20)
+        await asyncio.sleep(10)
         try:
             await message.delete()
         except Exception as e:
