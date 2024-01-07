@@ -21,7 +21,7 @@ async def clearfred(ctx: interactions.SlashContext):
 
     await ctx.send(f"Deleted {len(fredboat_messages)} message(s) from FredBoat.", ephemeral=True)
 
-userids = (945683386100514827, 184405311681986560)
+userids = (945683386100514827, 184405311681986560, 272247536729980932)
 @bot.event
 async def on_message_create(message):
     if message.author.id in userids:
