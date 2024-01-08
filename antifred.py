@@ -2,6 +2,7 @@ import asyncio
 import os
 import interactions
 
+intents = interactions.Intents.DEFAULT | interactions.Intents.GUILD_MESSAGES
 bot = interactions.Client(token=os.getenv('DISCORD_BOT_TOKEN'))
 
 @interactions.slash_command(
@@ -21,7 +22,7 @@ async def clearfred(ctx: interactions.SlashContext):
 
     await ctx.send(f"Deleted {len(fredboat_messages)} message(s) from FredBoat.", ephemeral=True)
 
-userids = (945683386100514827, 184405311681986560, 272247536729980932)
+userids = (945683386100514827, 184405311681986560)
 @bot.event
 async def on_message_create(message):
     if message.author.id in userids:
